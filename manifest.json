@@ -1,6 +1,6 @@
 {
     "manifest_version": 3,
-    "name": "TaBBetter",
+    "name": "TABBetter",
     "description": "AI-powered tab organization for focus and efficiency.",
     "version": "0.1.0",
     "action": {
