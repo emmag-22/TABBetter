@@ -1,0 +1,35 @@
+body {
+    font-family: system-ui, sans-serif;
+    width: 300px;
+    margin: 0;
+    padding: 16px;
+  }
+  
+  #splash {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 120px;
+  }
+  
+  .logo {
+    font-size: 24px;
+    font-weight: bold;
+  }
+  
+  .butterfly {
+    display: inline-block;
+    animation: flyAway 1.2s ease-in forwards;
+  }
+  
+  @keyframes flyAway {
+    to {
+      transform: translate(60px, -60px);
+      opacity: 0;
+    }
+  }
+  
+  .hidden {
+    display: none;
+  }
+  

@@ -1,0 +1,17 @@
+{
+    "manifest_version": 3,
+    "name": "TaBBetter",
+    "description": "AI-powered tab organization for focus and efficiency.",
+    "version": "0.1.0",
+    "action": {
+      "default_popup": "popup.html"
+    },
+    "permissions": [
+      "tabs",
+      "tabGroups"
+    ],
+    "background": {
+      "service_worker": "background.js"
+    }
+  }
+  
