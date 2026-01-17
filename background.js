@@ -1,3 +1,8 @@
+// Import modules
+import { embedText } from "./embed.js";
+import { clusterTabs } from "./cluster.js";
+import { nameCluster, colorForName } from "./naming.js";
+
 // Runs when program is installed 
 chrome.runtime.onInstalled.addListener(() => {
   console.log("TABBetter installed");
@@ -7,19 +12,52 @@ chrome.runtime.onInstalled.addListener(() => {
 const pageDataByTab = {};
 
 // Listen for messages from content scripts
-chrome.runtime.onMessage.addListener((msg, sender) => {
+chrome.runtime.onMessage.addListener(async (msg, sender, sendResponse) => {
   if (msg.type === "PAGE_INFO" && sender.tab?.id != null) {
-    const tabId = sender.tab.id;
-    pageDataByTab[tabId] = msg.payload;
+    pageDataByTab[sender.tab.id] = msg.payload;
+  }
+
+  if (msg.type === "EXTRACT_TABS") {
+    await extractAllTabs();
+    sendResponse({ status: "done" });
+    return true; // keep channel open
+  }
+
+  if (msg.type === "SEND_BACKEND") {
+    await sendToBackend(); // mock or real
+    sendResponse({ status: "done" });
+    return true;
+  }
+
+  if (msg.type === "ORGANIZE_TABS") {
+    // Convert pageDataByTab to array
+    const tabs = Object.entries(pageDataByTab).map(([tabId, data]) => ({
+      tabId: Number(tabId),
+      ...data
+    }));
+
+    const clusters = await organizeTabs(tabs);
+
+    // Apply Chrome tabGroups
+    for (const cluster of clusters) {
+      const groupId = await chrome.tabs.group({ tabIds: cluster.tabs.map(t => t.tabId) });
+      await chrome.tabGroups.update(groupId, {
+        title: cluster.name,
+        color: cluster.color
+      });
+    }
+
+    sendResponse({ status: "done" });
+    return true;
   }
 });
 
-// Extract tabs when popup asks
+// ---------------------
+// Extract tabs
+// ---------------------
 async function extractAllTabs() {
-  // Get all tabs in the current window
   const tabs = await chrome.tabs.query({ currentWindow: true });
 
-  // Filter out tabs we cannot access
   const normalTabs = tabs.filter(
     tab => tab.url && tab.url.startsWith("http") && !tab.pinned
   );
@@ -38,7 +76,27 @@ async function extractAllTabs() {
   console.log("Extraction complete for tabs:", normalTabs.map(t => t.id));
 }
 
-// Send collected data to backend (mock if needed)
+// ---------------------
+// Local API for grouping
+// ---------------------
+async function organizeTabs(tabs) {
+  for (const tab of tabs) {
+    tab.embedding = await embedText(tab.title + " " + tab.text);
+  }
+
+  const clusters = clusterTabs(tabs);
+
+  for (const cluster of clusters) {
+    cluster.name = nameCluster(cluster);
+    cluster.color = colorForName(cluster.name);
+  }
+
+  return clusters;
+}
+
+// ---------------------
+// Send to backend (mocked for now)
+// ---------------------
 async function sendToBackend() {
   const payload = {
     tabs: Object.entries(pageDataByTab).map(([tabId, data]) => ({
@@ -47,28 +105,15 @@ async function sendToBackend() {
     }))
   };
 
-  try {
-    // For testing, you can comment this out if backend is not ready
-    const response = await fetch("http://localhost:8000/analyze", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    });
-    const result = await response.json();
-    console.log("Backend grouping result:", result);
-  } catch (err) {
-    console.error("Failed to send to backend:", err);
+  console.log("Mock sending to backend:", payload);
+
+  // Example mock grouping
+  const mockResult = [
+    { tabIds: payload.tabs.map(t => t.id), name: "Demo Group", color: "blue" }
+  ];
+
+  for (const group of mockResult) {
+    const groupId = await chrome.tabs.group({ tabIds: group.tabIds });
+    await chrome.tabGroups.update(groupId, { title: group.name, color: group.color });
   }
 }
-
-// Expose functions to popup
-chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
-  if (msg.type === "EXTRACT_TABS") {
-    extractAllTabs().then(() => sendResponse({ status: "done" }));
-    return true; // keep channel open
-  }
-  if (msg.type === "SEND_BACKEND") {
-    sendToBackend().then(() => sendResponse({ status: "done" }));
-    return true;
-  }
-});
