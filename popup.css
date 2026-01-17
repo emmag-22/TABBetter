@@ -1,35 +1,43 @@
 body {
-    font-family: system-ui, sans-serif;
-    width: 300px;
-    margin: 0;
-    padding: 16px;
+  width: 280px;
+  height: 180px;
+  font-family: system-ui, sans-serif;
+  margin: 0;
+}
+
+#splash {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+#butterfly {
+  width: 60px;
+  animation: flyIn 1.2s ease-out forwards;
+}
+
+h1 span {
+  color: #7c5cff;
+}
+
+#app {
+  padding: 16px;
+  text-align: center;
+}
+
+.hidden {
+  display: none;
+}
+
+@keyframes flyIn {
+  from {
+    transform: translateY(-80px) scale(0.6);
+    opacity: 0;
   }
-  
-  #splash {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 120px;
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
   }
-  
-  .logo {
-    font-size: 24px;
-    font-weight: bold;
-  }
-  
-  .butterfly {
-    display: inline-block;
-    animation: flyAway 1.2s ease-in forwards;
-  }
-  
-  @keyframes flyAway {
-    to {
-      transform: translate(60px, -60px);
-      opacity: 0;
-    }
-  }
-  
-  .hidden {
-    display: none;
-  }
-  
+}
