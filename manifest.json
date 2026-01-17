@@ -1,17 +1,26 @@
 {
-    "manifest_version": 3,
-    "name": "TABBetter",
-    "description": "AI-powered tab organization for focus and efficiency.",
-    "version": "0.1.0",
-    "action": {
-      "default_popup": "popup.html"
-    },
-    "permissions": [
-      "tabs",
-      "tabGroups"
-    ],
-    "background": {
-      "service_worker": "background.js"
+  "manifest_version": 3,
+  "name": "TABBetter",
+  "description": "AI-powered tab organization for focus and efficiency.",
+  "version": "0.1.1",
+
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "assets/icon16.png",
+      "48": "assets/icon48.png",
+      "128": "assets/icon128.png"
     }
+  },
+
+  "icons": {
+    "16": "assets/icon16.png",
+    "48": "assets/icon48.png",
+    "128": "assets/icon128.png"
+  },
+
+  "permissions": ["tabs", "tabGroups"],
+  "background": {
+    "service_worker": "background.js"
   }
-  
+}
