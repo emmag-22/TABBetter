@@ -1,26 +1,23 @@
-const splash = document.getElementById("splash");
-const app = document.getElementById("app");
-const status = document.getElementById("status");
+const organizeBtn = document.getElementById("organizeBtn");
+const memoryBtn = document.getElementById("memoryBtn");
 
-// Splash screen animation: hide after 1.2s
-setTimeout(() => {
-  splash.style.display = "none";
-  app.classList.remove("hidden");
-}, 1200);
+let isOrganizing = false;
 
-// Organize Tabs button
-document.getElementById("organize").addEventListener("click", () => {
-  status.textContent = "Extracting tabs...";
+organizeBtn.addEventListener("click", () => {
+  if (isOrganizing) return;
 
-  // Step 1: ask background script to inject content scripts into all tabs
-  chrome.runtime.sendMessage({ type: "EXTRACT_TABS" }, (res) => {
-    if (res?.status === "done") {
-      status.textContent = "Sending data to backend...";
+  isOrganizing = true;
+  organizeBtn.disabled = true;
+  organizeBtn.querySelector("span").textContent = "Organizing...";
 
-      // Step 2: ask background script to send collected tab info to backend
-      chrome.runtime.sendMessage({ type: "SEND_BACKEND" }, (res2) => {
-        status.textContent = "Tabs sent to backend!";
-      });
-    }
-  });
+  // Simulate organizing
+  setTimeout(() => {
+    isOrganizing = false;
+    organizeBtn.disabled = false;
+    organizeBtn.querySelector("span").textContent = "Organize Tabs";
+  }, 2000);
+});
+
+memoryBtn.addEventListener("click", () => {
+  console.log("Saving memory space...");
 });
