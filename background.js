@@ -1,4 +1,4 @@
-// runs when program is installed 
+// Runs when program is installed 
 chrome.runtime.onInstalled.addListener(() => {
   console.log("TABBetter installed");
 });
@@ -8,31 +8,37 @@ const pageDataByTab = {};
 
 // Listen for messages from content scripts
 chrome.runtime.onMessage.addListener((msg, sender) => {
-  if (msg.type === "PAGE_INFO") {
+  if (msg.type === "PAGE_INFO" && sender.tab?.id != null) {
     const tabId = sender.tab.id;
     pageDataByTab[tabId] = msg.payload;
   }
 });
 
-// Extract tabs when popup is opened
+// Extract tabs when popup asks
 async function extractAllTabs() {
-  const tabs = await chrome.tabs.query({});
-  for (const tab of tabs) {
-    if (!tab.url || tab.pinned) continue;
+  // Get all tabs in the current window
+  const tabs = await chrome.tabs.query({ currentWindow: true });
 
-    // Inject content script
+  // Filter out tabs we cannot access
+  const normalTabs = tabs.filter(
+    tab => tab.url && tab.url.startsWith("http") && !tab.pinned
+  );
+
+  for (const tab of normalTabs) {
     try {
       await chrome.scripting.executeScript({
         target: { tabId: tab.id },
         files: ["content.js"]
       });
-    } catch (err) {
-      console.warn(`Cannot inject into tab ${tab.id}:`, err);
+    } catch (e) {
+      console.warn("Could not inject into tab:", tab.id, e.message);
     }
   }
+
+  console.log("Extraction complete for tabs:", normalTabs.map(t => t.id));
 }
 
-// Send collected data to backend
+// Send collected data to backend (mock if needed)
 async function sendToBackend() {
   const payload = {
     tabs: Object.entries(pageDataByTab).map(([tabId, data]) => ({
@@ -42,6 +48,7 @@ async function sendToBackend() {
   };
 
   try {
+    // For testing, you can comment this out if backend is not ready
     const response = await fetch("http://localhost:8000/analyze", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
