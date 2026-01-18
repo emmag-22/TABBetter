@@ -3,7 +3,7 @@
   "name": "TABBetter",
   "description": "AI-powered tab organization for focus and efficiency.",
   "version": "0.3.0",
-  "permissions": ["tabs", "tabGroups", "storage"],
+  "permissions": ["tabs", "tabGroups", "storage", "processes"]
   "background": {
     "service_worker": "background.js"
   },

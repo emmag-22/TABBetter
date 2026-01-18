@@ -1,5 +1,0 @@
-// Add this in your existing AI categorization logic
-chrome.tabs.group({ tabIds: [...] }, (groupId) => {
-   // This tells the background script: "Treat this as a new active context"
-   chrome.runtime.sendMessage({ action: "NEW_GROUP", groupId: groupId });
-});
