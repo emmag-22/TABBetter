@@ -60,7 +60,7 @@ All through a calm, minimal interface designed to reduce visual noise.
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 ### Frontend
 - **HTML5** – Popup structure and layout  
@@ -88,7 +88,7 @@ All through a calm, minimal interface designed to reduce visual noise.
 
 ---
 
-## 🧠 How It Works
+## How It Works
 
 ### Smart Grouping Flow
 1. User clicks **“Organize Tabs”**  
@@ -109,7 +109,7 @@ All through a calm, minimal interface designed to reduce visual noise.
 
 ---
 
-## 🌱 Environmental Impact
+## Environmental Impact
 
 Inactive tabs don’t just slow down your device — they consume energy.
 
@@ -121,7 +121,7 @@ TABBetter promotes **conscious browsing**, benefiting both users and the environ
 
 ---
 
-## 🎯 Why TABBetter?
+## Why TABBetter?
 
 - No accounts  
 - No tracking  
@@ -132,7 +132,7 @@ Just a **smarter browser experience**, powered by AI.
 
 ---
 
-## 🚀 Future Improvements
+## Future Improvements
 
 - Real memory usage via Chrome performance APIs  
 - Auto-suggest closing tabs after inactivity  
@@ -142,7 +142,7 @@ Just a **smarter browser experience**, powered by AI.
 
 ---
 
-## 👥 Built For
+## Built For
 
 - Students  
 - Developers  
@@ -152,6 +152,6 @@ Just a **smarter browser experience**, powered by AI.
 
 ---
 
-## 🏁 Hackathon Project
+## Hackathon Project
 
 **TABBetter** was built for **McHacks 2026** as a proof-of-concept demonstrating how AI can improve everyday productivity tools with minimal friction.
