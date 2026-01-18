@@ -1,15 +1,120 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TABBetter</title>
   <style>
-    body { width: 200px; padding: 10px; font-family: sans-serif; }
-    button { width: 100%; padding: 10px; cursor: pointer; background: #4285f4; color: white; border: none; border-radius: 4px; }
+    :root {
+      --green: #22c55e;
+      --green-dark: #16a34a;
+      --teal: #14b8a6;
+      --teal-dark: #0f766e;
+      --bg: rgba(255, 255, 255, 0.8);
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    }
+
+    html, body { 
+      width: 280px;
+      margin: 0;
+      background: transparent;
+      overflow: hidden;
+    }
+
+    body {
+      background: #f0fdfa; /* Fixed background color syntax */
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .popup {
+      width: 100%;
+      border-radius: 18px;
+      background: var(--bg);
+      backdrop-filter: blur(16px); /* Fixed space error */
+      box-shadow: 0 0 40px rgba(20, 184, 166, 0.3); /* Fixed space error */
+      border: 1px solid rgba(20, 184, 166, 0.3);
+      overflow: hidden;
+    }
+
+    .header {
+      background: linear-gradient(90deg, #0f766e, #14b8a6);
+      padding: 14px 16px;
+      color: white;
+      text-align: left;
+    }
+
+    .header h1 {
+      margin: 0;
+      font-size: 14px;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+    }
+
+    .actions {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    
+    .btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.1s, opacity 0.2s;
+    }
+
+    .btn:hover { opacity: 0.9; }
+    .btn:active { transform: scale(0.97); }
+
+    .btn-green { background-color: var(--green); }
+    .btn-teal { background-color: var(--teal); }
+
+    #status { 
+      font-size: 0.8rem; 
+      text-align: center;
+      margin-top: 10px;
+      color: #666;
+      min-height: 20px;
+    }
   </style>
 </head>
 <body>
-  <h3>Tab Organizer</h3>
-  <button id="groupBtn">Organize Tabs</button>
-  <p id="status"></p>
+
+  <div id="root">
+    <div class="popup">
+      <div class="header">
+        <h1>TABBetter</h1>
+      </div>
+
+      <div class="actions">
+        <button id="organizeBtn" class="btn btn-green">
+          ✨ <span>Organize Tabs</span>
+        </button>
+        
+        <button id="memoryBtn" class="btn btn-teal">
+          💾 <span>Save Memory Space</span>
+        </button>
+
+        <p id="status" class="hidden"></p>
+      </div>
+    </div>
+  </div>
+
   <script src="popup.js"></script>
 </body>
 </html>
