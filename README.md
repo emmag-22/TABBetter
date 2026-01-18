@@ -3,7 +3,7 @@
 
 ---
 
-## 🚨 The Problem
+## The Problem
 
 Modern browsing encourages multitasking, but dozens of open tabs quickly turn into cognitive overload.  
 A cluttered browser:
@@ -17,9 +17,9 @@ What starts as “just a few tabs” becomes a productivity and performance prob
 
 ---
 
-## 💡 The Solution
+## The Solution
 
-**TABBetter** is a lightweight, AI-powered Chrome extension that transforms tab chaos into clarity.
+**TABBetter** is an AI-powered Chrome extension that transforms tab chaos into clarity.
 
 With **one click**, TABBetter:
 - Automatically groups related tabs into meaningful categories using AI  
@@ -32,7 +32,7 @@ All through a calm, minimal interface designed to reduce visual noise.
 
 ---
 
-## ✨ Key Features
+## Key Features
 
 1. **Smart Tab Grouping (AI-powered)**  
    - Uses **Google’s Gemini API** to analyze open tab titles  
@@ -42,7 +42,11 @@ All through a calm, minimal interface designed to reduce visual noise.
 2. **Memory Manager**  
    - Estimates RAM usage per tab  
    - Displays tabs **sorted from highest to lowest memory usage**  
-   - Helps users quickly identify performance bottlenecks  
+   - Helps users decide which inactive tabs to close and free up memory
+
+    > **Note:** Chrome restricts access to exact per-tab memory usage on stable builds for privacy and security.  
+    > TABBetter therefore uses estimated values, which are sufficient for comparison and fit the project’s time constraints.
+
 
 3. **Clean, Intuitive UI**  
    - Designed in **Figma** with a focus on calm, clarity, and accessibility  
