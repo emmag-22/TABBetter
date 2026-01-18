@@ -1,4 +1,4 @@
-const API_KEY = "AIzaSyCgnqPy1Coxv9V4pZVeqS_Ybrj9-jRAKIs";
+const API_KEY = "AIzaSyDm8y9wul_FhQdcICrEznB77Tjm9HF2XO4"; // Paste secret API key here
 
 document.getElementById('groupBtn').addEventListener('click', async () => {
   const status = document.getElementById('status');
