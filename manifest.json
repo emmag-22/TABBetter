@@ -3,8 +3,10 @@
   "name": "TABBetter",
   "description": "AI-powered tab organization for focus and efficiency.",
   "version": "0.3.0",
-  "permissions": ["tabs", "tabGroups"],
-
+  "permissions": ["tabs", "tabGroups", "storage"],
+  "background": {
+    "service_worker": "background.js"
+  },
   "action": {
     "default_popup": "popup.html",
     "default_icon": {
@@ -13,13 +15,11 @@
       "128": "assets/icon128.png"
     }
   },
-
   "icons": {
     "16": "assets/icon16.png",
     "48": "assets/icon48.png",
     "128": "assets/icon128.png"
   },
-
   "host_permissions": [
     "https://generativelanguage.googleapis.com/*"
   ]
