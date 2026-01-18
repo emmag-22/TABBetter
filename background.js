@@ -51,3 +51,32 @@ async function organizeTabsWithAI() {
     }
   }
 }
+
+chrome.runtime.onMessage.addListener(async (msg, sender, sendResponse) => {
+  if (msg.type === "GET_TAB_MEMORY") {
+    const tabs = await chrome.tabs.query({ currentWindow: true });
+    const results = [];
+
+    for (const tab of tabs) {
+      try {
+        const pid = await chrome.processes.getProcessIdForTab(tab.id);
+        const info = await chrome.processes.getProcessInfo(pid, true);
+
+        const mb = Math.round(info.privateMemory / 1024 / 1024);
+
+        results.push({
+          title: tab.title,
+          memory: mb + " MB"
+        });
+      } catch {
+        results.push({
+          title: tab.title,
+          memory: "N/A"
+        });
+      }
+    }
+
+    sendResponse(results);
+  }
+  return true;
+});
