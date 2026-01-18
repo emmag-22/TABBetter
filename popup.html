@@ -1,65 +1,81 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <style>
-    #ramList div {
-        display: flex;
-        justify-content: space-between;
-        padding: 10px 0;
-        border-bottom: 1px solid #f0f0f0;
-        font-size: 13px;
-    }
-    #ramList span.size {
-        font-weight: bold;
-        color: #1a73e8;
-    }
-
-    body { width: 200px; padding: 10px; font-family: sans-serif; }
-    button { width: 100%; padding: 10px; cursor: pointer; background: #4285f4; color: white; border: none; border-radius: 4px; }
-    .spinner {
-    width: 14px;
-    height: 14px;
-    border: 2px solid rgba(255,255,255,0.3);
-    border-top: 2px solid #ffffff;
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-    display: none; /* Hidden by default */
-    margin-left: 10px;
-    vertical-align: middle;
-  }
-
-  @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-  }
-  
-  /* Make button show items side-by-side */
-  #groupBtn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  </style>
+  <title>TABBetter</title>
+  <link rel="stylesheet" href="popup.css" />
 </head>
-
 <body>
-  <h3>Tab Organizer</h3>
-  <button id="groupBtn">
-    Organize Tabs <div id="loader" class="spinner"></div>
-  <button id="ungroupBtn" class="btn-secondary">Ungroup All</button>
-  <button id="memoryBtn" class="btn-secondary">Memory Manager</button>
-  <p id="status"></p>
 
-  <div id="memoryPage" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:white; z-index:100; padding:15px; overflow-y:auto; box-sizing: border-box;">
-    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom: 2px solid #eee; padding-bottom:10px; margin-bottom:15px;">
-        <h3 style="margin:0; font-family: sans-serif;">Memory Manager</h3>
-        <button id="closeMemory" style="width:auto; padding:5px 10px; cursor:pointer;">Back</button>
+  <!-- SPLASH SCREEN -->
+  <div id="splash" class="screen">
+    <div class="splash-card">
+      <div class="logo-row">
+        <span class="logo-text">TA</span>
+        <img src="assets/butterfly.png" class="butterfly" />
+        <span class="logo-text">etter</span>
+      </div>
     </div>
-    <div id="ramList" style="font-family: sans-serif;">
-        <p style="color:#666;">Calculating memory...</p>
+  </div>
+
+  <!-- MAIN APP -->
+  <div id="app" class="screen hidden">
+    <header class="header">
+      <div class="brand-row">
+        <span class="brand-text">TA</span>
+        <img src="assets/butterfly-white.png" class="brand-logo" />
+        <span class="brand-text">etter</span>
+      </div>
+      <p class="tagline">peace of tabs. peace of mind.</p>
+    </header>
+
+    <div class="info-card">
+      <div class="info-row">
+        <span class="info-icon">🧠</span>
+        <span>Less tab chaos = less brain chaos</span>
+      </div>
+      <div class="info-row">
+        <span class="info-icon">🍃</span>
+        <span>Close inactive tabs to save RAM & help the environment</span>
+      </div>
     </div>
-</div>
-<script src="popup.js"></script>
+
+    <button id="groupBtn" class="btn primary">Organize Tabs ✨</button>
+    <button id="ungroupBtn" class="btn secondary">Ungroup All ↺</button>
+    <button id="memoryBtn" class="btn tertiary">Memory Manager 💾</button>
+
+    <p id="status" class="status-text">
+      <span id="statusText"></span>
+      <span id="statusSpinner" class="spinner hidden"></span>
+    </p>
+  </div>
+
+  <!-- MEMORY MANAGER SCREEN -->
+  <div id="memoryPage" class="screen hidden">
+
+    <header class="memory-header">
+      <button id="closeMemory">←</button>
+      <h2>Memory Manager</h2>
+    </header>
+
+    <!-- EXPLANATION CARD -->
+    <div class="memory-info">
+      <p class="memory-info-text">
+        Monitoring RAM usage helps your browser run faster and smoother.
+        Remember to close inactive tabs to free up memory!
+      </p>
+
+      <p class="memory-info-stat">
+        💡 Background browser activity accounts for <strong>10–20%</strong>
+        of memory usage during heavy tab sessions.
+      </p>
+    </div>
+
+    <!-- SCROLLABLE LIST -->
+    <div id="ramList"></div>
+
+  </div>
+
+  <script src="popup.js"></script>
 </body>
 </html>

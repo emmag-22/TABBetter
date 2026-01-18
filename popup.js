@@ -1,8 +1,12 @@
-const API_KEY = "AIzaSyCNGaXohesBGrr9lGqOT1nFNpCPRV_4s-A"; // Paste secret API key here
+const API_KEY = "AIzaSyDE9Sf05YTI5LCovW4qXgbvEIJNj2LZmxI"; // Paste secret API key here
 
 /* =========================
    AI TAB GROUPING
 ========================= */
+
+const statusText = document.getElementById("statusText");
+const spinner = document.getElementById("statusSpinner");
+
 
 document.getElementById('groupBtn').addEventListener('click', async () => {
   const status = document.getElementById('status');
@@ -21,6 +25,11 @@ document.getElementById('groupBtn').addEventListener('click', async () => {
         contents: [{
           parts: [{
             text: `Group these chrome tabs into logical categories. 
+            Rules:
+- Category names must be SHORT (1–2 words max)
+- Prefer simple nouns
+- No "&", "and", or long phrases
+- Examples: "School", "News", "Shopping", "Media", "Work"
 Return ONLY a JSON array of objects:
 [{"name":"Category","color":"blue","tabIds":[1,2]}].
 Tabs: ${JSON.stringify(tabData)}`
@@ -41,16 +50,50 @@ Tabs: ${JSON.stringify(tabData)}`
 
     for (const group of groups) {
       const groupId = await chrome.tabs.group({ tabIds: group.tabIds });
+
+      function normalizeGroupColor(color) {
+        const allowed = [
+          "blue",
+          "cyan",
+          "green",
+          "grey",
+          "orange",
+          "pink",
+          "purple",
+          "red",
+          "yellow"
+        ];
+      
+        if (!color) return "blue";
+      
+        const c = color.toLowerCase();
+      
+        if (allowed.includes(c)) return c;
+      
+        // Smart fallbacks for AI colors
+        if (c.includes("teal") || c.includes("mint") || c.includes("aqua")) return "cyan";
+        if (c.includes("emerald")) return "green";
+        if (c.includes("violet")) return "purple";
+        if (c.includes("rose")) return "pink";
+      
+        return "blue"; // safe default
+      }
+      
+
       await chrome.tabGroups.update(groupId, {
         title: group.name,
-        color: group.color
+        color: normalizeGroupColor(group.color)
       });
+      
     }
 
     status.innerText = "Done!";
   } catch (error) {
     status.innerText = "Error! Check console.";
     console.error("Extension Error:", error);
+    spinner.classList.add("hidden");
+    statusText.textContent = "Error. Check console.";
+
   }
 });
 
@@ -72,48 +115,27 @@ document.getElementById('ungroupBtn').addEventListener('click', async () => {
    MEMORY MANAGER (ESTIMATED)
 ========================= */
 
-document.addEventListener('DOMContentLoaded', () => {
-  const memoryBtn = document.getElementById('memoryBtn');
-  const memoryPage = document.getElementById('memoryPage');
-  const closeMemory = document.getElementById('closeMemory');
+function loadMemoryManager() {
   const ramList = document.getElementById('ramList');
+  ramList.innerHTML = "Calculating memory...";
 
-  memoryBtn.addEventListener('click', async () => {
-    memoryPage.style.display = 'block';
-    ramList.innerHTML = "Calculating memory...";
+  chrome.tabs.query({ currentWindow: true }).then(tabs => {
+    const memoryData = tabs.map(tab => ({
+      title: tab.title || "New Tab",
+      memory: estimateTabMemory(tab)
+    }));
 
-    try {
-      const tabs = await chrome.tabs.query({ currentWindow: true });
+    memoryData.sort((a, b) => b.memory - a.memory);
 
-      const memoryData = tabs.map(tab => ({
-        title: tab.title || "New Tab",
-        memory: estimateTabMemory(tab)
-      }));
-
-      ramList.innerHTML = memoryData.map(item => `
-        <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #eee; font-size:13px">
-          <span style="max-width:140px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
-            ${item.title}
-          </span>
-          <b style="color:#1a73e8;">
-            ${item.memory} MB
-          </b>
-        </div>
-      `).join('') + `
-        <p style="font-size:11px; color:#888; margin-top:8px;">
-          Estimated memory usage (Chrome does not expose exact per-tab RAM)
-        </p>
-      `;
-    } catch (err) {
-      console.error(err);
-      ramList.innerHTML = "Error calculating memory.";
-    }
+    ramList.innerHTML = memoryData.map(item => `
+      <div class="ram-item">
+        <div class="ram-title">${item.title}</div>
+        <div class="ram-size">${item.memory} MB</div>
+      </div>
+    `).join("");
   });
+}
 
-  closeMemory.addEventListener('click', () => {
-    memoryPage.style.display = 'none';
-  });
-});
 
 /* =========================
    MEMORY ESTIMATION LOGIC
@@ -137,3 +159,70 @@ function estimateTabMemory(tab) {
 
   return mb;
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+  const splash = document.getElementById("splash");
+  const app = document.getElementById("app");
+  const butterfly = document.querySelector(".butterfly");
+
+  if (!splash || !app || !butterfly) return;
+
+  // Ensure main app is hidden initially
+  app.classList.add("hidden");
+
+  // When the butterfly animation finishes → show app
+  butterfly.addEventListener("animationend", () => {
+    // Delay AFTER animation finishes
+    setTimeout(() => {
+      splash.classList.add("hidden");
+      app.classList.remove("hidden");
+    }, 800); // 👈 delay in milliseconds
+  });
+  
+});
+
+function showScreen(id) {
+  document.querySelectorAll(".screen").forEach(screen => {
+    screen.classList.add("hidden");
+  });
+
+  document.getElementById(id).classList.remove("hidden");
+}
+
+window.addEventListener("DOMContentLoaded", () => {
+  // show splash first
+  showScreen("splash");
+
+  // wait for animation + extra delay
+  setTimeout(() => {
+    showScreen("app");
+  }, 1800); // <-- adjust delay here
+});
+
+document.getElementById("memoryBtn").addEventListener("click", () => {
+  showScreen("memoryPage");
+  loadMemoryManager(); // your existing logic
+});
+
+document.getElementById("closeMemory").addEventListener("click", () => {
+  showScreen("app");
+});
+
+status.style.opacity = 0;
+setTimeout(() => {
+  const statusText = document.getElementById("statusText");
+  const spinner = document.getElementById("statusSpinner");
+
+  statusText.textContent = "Analyzing tabs";
+  spinner.classList.remove("hidden");
+
+
+  status.style.opacity = 1;
+}, 150);
+
+statusText.textContent = "Done!";
+spinner.classList.add("hidden");
+
+
+console.log("Spinner element:", spinner);
+

@@ -1,43 +1,434 @@
-body {
-  width: 280px;
-  height: 180px;
-  font-family: system-ui, sans-serif;
-  margin: 0;
+* {
+  box-sizing: border-box;
+  font-family: system-ui, -apple-system, sans-serif;
 }
 
-#splash {
+body {
+  width: 320px;
+  margin: 0;
+  background: #f6fffc;
+}
+
+/* SCREENS */
+.screen {
+  position: absolute;
+  inset: 0;
+  padding: 12px;          /* slightly tighter */
+  overflow: hidden;       /* control scrolling inside sections */
+}
+
+.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* SPLASH */
+.splash-card {
   height: 100%;
+  background: linear-gradient(135deg, #0fb9b1, #20bf6b);
+  border-radius: 18px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  color: white;
 }
 
-#butterfly {
-  width: 60px;
+.butterfly {
+  width: 70px;
   animation: flyIn 1.2s ease-out forwards;
 }
 
-h1 span {
-  color: #7c5cff;
+@keyframes flyIn {
+  from { transform: translateY(-40px) scale(0.7); opacity: 0; }
+  to { transform: translateY(4) scale(1); opacity: 1; }
 }
 
-#app {
-  padding: 16px;
+/* HEADER */
+.header {
+  background: linear-gradient(135deg, #0fb9b1, #20bf6b);
+  border-radius: 18px;
+
+  padding: 28px 20px 24px;
+  margin-bottom: 18px;
+
+  color: white;
   text-align: center;
+
+  box-shadow: 0 16px 30px rgba(14, 118, 110, 0.25);
+}
+
+.brand-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: -10px;
+  margin-bottom: 12px;
+}
+
+/* TA / etter text */
+.brand-text {
+  font-size: 34px;          /* ⬅️ BIG */
+  font-weight: 800;
+  letter-spacing: 1.2px;
+  color: white;
+  opacity: 1;
+  transform: translateY(8px)
+}
+
+/* Butterfly logo */
+.brand-logo {
+  width: 60px;              /* ⬅️ noticeably bigger */
+  height: auto;
+
+  margin: 0 -4px;
+  transform: translateY(1px);
+}
+
+
+/* TAGLINE */
+.tagline {
+  font-size: 16px;          /* ⬅️ bigger slogan */
+  font-style: italic;
+  opacity: 0.95;
+
+  margin: 0;
+}
+
+
+.tagline {
+  font-style: italic;
+  opacity: 0.9;
+}
+
+/* INFO CARD */
+/* INFO CARD — BIGGER & MATCH HEADER */
+.info-card {
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  margin: 18px 0;
+
+  border: 1px solid #c7f0e7;
+  color: #245f5a;
+
+  width: 100%;              /* ⬅️ full width like header */
+  box-sizing: border-box;
+}
+
+/* Individual rows */
+.info-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+
+  font-size: 16px;          /* ⬅️ bigger text */
+  line-height: 1.5;
+  margin-bottom: 12px;
+}
+
+.info-row:last-child {
+  margin-bottom: 0;
+}
+
+/* Emoji / icon sizing */
+.info-icon {
+  font-size: 20px;
+  line-height: 1;
+  margin-top: 2px;
+}
+
+/* BUTTONS */
+.btn {
+  width: 100%;
+  padding: 14px;
+  border-radius: 999px;
+  border: none;
+  font-size: 16px;
+  color: white;
+  margin-top: 10px;
+  cursor: pointer;
+}
+
+.primary {
+  background: linear-gradient(135deg, #2ecc71, #1abc9c);
+}
+
+.secondary {
+  background: linear-gradient(135deg, #20bf6b, #0fb9b1);
+}
+
+.tertiary {
+  background: linear-gradient(135deg, #0fb9b1, #16a085);
+}
+
+/* MEMORY */
+
+#ramList div {
+  background: white;
+  border-radius: 12px;
+  padding: 10px;
+  margin-top: 8px;
+  display: flex;
+  justify-content: space-between;
+  border: 1px solid #d9f4ec;
+}
+
+.logo-row {
+  display: flex;
+  align-items: center;
+  gap: -8px;
+  transform: scale(1.25); /* ⬅️ increase size */
+}
+
+.logo-text {
+  font-size: 36px; /* keep base size */
+  font-weight: 700;
+  color: #0E766E;
+  letter-spacing: -0.6px;
+}
+
+
+.butterfly {
+  width: 80px;
+  margin: 0 -1px;
+}
+
+
+
+.splash-card {
+  height: 100%;
+  border-radius: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  /* LAYERED HALO BACKGROUND */
+  background:
+    radial-gradient(
+      circle at center,
+      rgba(255, 255, 255, 0.9) 0%,
+      #f1fffa 35%,
+      #e4faf3 60%,
+      #d8f4ec 100%
+    );
+
+  box-shadow:
+    0 0 0 1px rgba(14, 118, 110, 0.18),
+    0 25px 60px rgba(14, 118, 110, 0.22);
+}
+
+
+.logo-row {
+  animation: fadeUp 0.9s ease-out forwards;
+}
+
+.screen {
+  position: absolute;
+  inset: 0;
+  transition: opacity 0.4s ease, transform 0.4s ease;
 }
 
 .hidden {
-  display: none;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(10px);
 }
 
-@keyframes flyIn {
+
+@keyframes fadeUp {
   from {
-    transform: translateY(-80px) scale(0.6);
     opacity: 0;
+    transform: translateY(10px);
   }
   to {
-    transform: translateY(0) scale(1);
     opacity: 1;
+    transform: translateY(0);
   }
+}
+
+html, body {
+  width: 360px;
+  height: 495px;
+  margin: 0;
+  padding: 0;
+  overflow: hidden; /* prevent double scroll */
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+#memoryPage {
+  gap: 4px;
+  display: flex;
+  flex-direction: column;
+}
+
+#ramList {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+}
+
+.ram-item {
+  background: white;
+  border-radius: 14px;
+  padding: 14px 16px;
+  margin-bottom: 12px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.06);
+}
+
+.ram-title {
+  font-size: 15px;
+  font-weight: 500;
+  color: #0e766e;
+  max-width: 70%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ram-size {
+  font-weight: 600;
+  color: #1e6cff;
+}
+
+.memory-header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+
+  color: #0e766e;
+  font-weight: 700;
+
+  padding: 14px 16px 8px; /* ⬅️ less top & bottom space */
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.memory-header button {
+  background: #e9faf6;          /* soft mint */
+  color: #0e766e;               /* brand teal */
+  border: none;
+
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 18px;
+  cursor: pointer;
+
+  box-shadow: 0 2px 6px rgba(14, 118, 110, 0.15);
+}
+
+html {
+  scroll-behavior: smooth; /* Enables smooth scrolling for the entire page */
+}
+
+.header-title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6 px; /* Space between text and logo */
+}
+
+.header-logo {
+  width: 36px;
+  height: auto;
+  margin-left: 2px;
+  transform: translateY(1px);
+}
+
+.header {
+  padding: 14px 16px;
+}
+
+.info-card {
+  margin: 10px 0;
+}
+
+.btn {
+  margin-top: 8px;
+}
+
+.status-text {
+  margin-top: 12px;
+  text-align: center;
+  font-size: 13px;
+  color: #7bbfb6;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+  min-height: 18px; /* prevents layout jump */
+}
+
+.status-text {
+  transition: opacity 0.25s ease;
+}
+
+.memory-info {
+  margin: 6px 0 10px;
+  padding: 14px 16px;
+
+  background: white;
+  border-radius: 14px;
+  border: 1px solid #c7f0e7;
+
+  box-shadow: 0 4px 10px rgba(14, 118, 110, 0.06);
+
+  margin-left: 16px;
+  margin-right: 16px;
+
+}
+
+.memory-info-text {
+  margin-bottom: 6px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #245f5a;
+  margin: 0 0 8px;
+}
+
+.memory-info-stat {
+  font-size: 13px;
+  color: #6aaea6;
+  margin: 0;
+}
+
+.spinner {
+  width: 14px;
+  height: 14px;
+  margin-left: 8px;
+
+  border: 2px solid rgba(123, 191, 182, 0.3);
+  border-top-color: #0e766e;
+  border-radius: 50%;
+
+  display: inline-block; /* 👈 REQUIRED */
+  vertical-align: middle;
+
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+
+.spinner {
+  opacity: 1;
+  transition: opacity 0.2s ease;
+}
+
+.spinner.hidden {
+  opacity: 0;
 }
