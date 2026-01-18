@@ -1,141 +1,139 @@
-const GEMINI_API_KEY = 'YOUR_GEMINI_API_KEY_HERE';
-const MAX_ACTIVE_GROUPS = 2; 
+const GEMINI_API_KEY = "YOUR_GEMINI_API_KEY_HERE";
+const MAX_ACTIVE_GROUPS = 2;
+
 let groupHistory = [];
 
-// --- 1. TABS ORGANIZATION LOGIC (GEMINI) ---
+const VALID_COLORS = [
+  "grey", "blue", "red", "yellow",
+  "green", "pink", "purple", "cyan", "orange"
+];
+
+// -------------------- TAB ORGANIZATION --------------------
+
 async function organizeTabs() {
   const tabs = await chrome.tabs.query({ currentWindow: true, pinned: false });
-  
-  const tabData = tabs.map(tab => ({
-    id: tab.id,
-    title: tab.title,
-    url: tab.url
+  if (!tabs.length) return;
+
+  const tabData = tabs.map(t => ({
+    id: t.id,
+    title: t.title,
+    url: t.url
   }));
 
   const prompt = `
-    Analyze these Chrome tabs and group them into logical categories.
-    For each category, provide a short 1-2 word name and a color: 
-    grey, blue, red, yellow, green, pink, purple, cyan, orange.
-    Tabs: ${JSON.stringify(tabData)}
-  `;
+Group these Chrome tabs logically.
+
+Return ONLY valid JSON:
+{
+  "groups": [
+    { "name": "Study", "color": "blue", "tabIds": [1,2] }
+  ]
+}
+
+Allowed colors: ${VALID_COLORS.join(", ")}
+
+Tabs:
+${JSON.stringify(tabData, null, 2)}
+`;
 
   try {
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: {
-          response_mime_type: "application/json",
-          response_schema: {
-            type: "object",
-            properties: {
-              groups: {
-                type: "array",
-                items: {
-                  type: "object",
-                  properties: {
-                    name: { type: "string" },
-                    color: { type: "string" },
-                    tabIds: { type: "array", items: { type: "integer" } }
-                  }
-                }
-              }
-            }
-          }
-        }
-      })
-    });
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }]
+        })
+      }
+    );
 
     const data = await response.json();
-    const result = JSON.parse(data.candidates[0].content.parts[0].text);
+    const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (!rawText) throw new Error("No Gemini output");
 
-    // Inside your organizeTabs() function, update the grouping loop:
-for (const group of result.groups) {
-  if (group.tabIds.length > 0) {
-      // Only use IDs that still exist AND are not currently being discarded
+    const result = JSON.parse(rawText);
+
+    for (const group of result.groups) {
+      if (!group.tabIds?.length) continue;
+
       const validTabIds = await checkValidTabs(group.tabIds);
-      
-      if (validTabIds.length > 0) {
-          try {
-              const groupId = await chrome.tabs.group({ tabIds: validTabIds });
-              await chrome.tabGroups.update(groupId, {
-                  title: group.name,
-                  color: group.color
-              });
-              handleGroupSwitch(groupId);
-          } catch (e) {
-              console.error("Error creating group:", e);
-          }
-      }
-  }
-}
-    console.log("Organization Complete");
-  } catch (error) {
-    console.error("AI Org Error:", error);
+      if (!validTabIds.length) continue;
+
+      const color = VALID_COLORS.includes(group.color)
+        ? group.color
+        : "grey";
+
+      const groupId = await chrome.tabs.group({ tabIds: validTabIds });
+      await chrome.tabGroups.update(groupId, {
+        title: group.name.slice(0, 15),
+        color
+      });
+
+      handleGroupSwitch(groupId);
+    }
+
+    console.log("✅ Tabs organized");
+  } catch (e) {
+    console.error("❌ Organize error:", e);
   }
 }
 
 async function checkValidTabs(ids) {
   const allTabs = await chrome.tabs.query({});
-  const existingIds = allTabs.map(t => t.id);
-  return ids.filter(id => existingIds.includes(id));
+  const existing = new Set(allTabs.map(t => t.id));
+  return ids.filter(id => existing.has(id));
 }
 
-// --- 2. RAM SUSPENSION LOGIC ---
-chrome.tabs.onActivated.addListener(async (activeInfo) => {
-    try {
-        const tab = await chrome.tabs.get(activeInfo.tabId);
-        if (tab.groupId !== chrome.tabGroups.TAB_GROUP_ID_NONE) {
-            handleGroupSwitch(tab.groupId);
-        }
-    } catch (e) { console.error(e); }
+// -------------------- SMART SUSPENSION --------------------
+
+chrome.tabs.onActivated.addListener(async ({ tabId }) => {
+  try {
+    const tab = await chrome.tabs.get(tabId);
+    if (tab.groupId !== chrome.tabGroups.TAB_GROUP_ID_NONE) {
+      handleGroupSwitch(tab.groupId);
+    }
+  } catch {}
 });
 
-async function handleGroupSwitch(newGroupId) {
-    // Logic: Move current group to the top of history
-    groupHistory = groupHistory.filter(id => id !== newGroupId);
-    groupHistory.unshift(newGroupId);
+function handleGroupSwitch(groupId) {
+  groupHistory = groupHistory.filter(id => id !== groupId);
+  groupHistory.unshift(groupId);
 
-    // If we exceed the limit, suspend the oldest groups
-    if (groupHistory.length > MAX_ACTIVE_GROUPS) {
-        const groupsToSuspend = groupHistory.slice(MAX_ACTIVE_GROUPS);
-        groupHistory = groupHistory.slice(0, MAX_ACTIVE_GROUPS);
-        groupsToSuspend.forEach(id => suspendEntireGroup(id));
-    }
+  if (groupHistory.length > MAX_ACTIVE_GROUPS) {
+    const toSuspend = groupHistory.slice(MAX_ACTIVE_GROUPS);
+    groupHistory = groupHistory.slice(0, MAX_ACTIVE_GROUPS);
+    toSuspend.forEach(suspendEntireGroup);
+  }
 }
 
 async function suspendEntireGroup(groupId) {
   try {
-      const tabs = await chrome.tabs.query({ groupId: groupId });
-      for (const tab of tabs) {
-          // Check if the tab actually has a renderer (status is 'complete')
-          // and isn't already discarded
-          if (!tab.active && !tab.audible && !tab.pinned && !tab.discarded && tab.status === 'complete') {
-              try {
-                  await chrome.tabs.discard(tab.id);
-              } catch (e) {
-                  console.warn(`Could not discard tab ${tab.id}: ${e.message}`);
-              }
-          }
+    const tabs = await chrome.tabs.query({ groupId });
+    for (const tab of tabs) {
+      if (
+        !tab.active &&
+        !tab.pinned &&
+        !tab.audible &&
+        !tab.discarded &&
+        tab.status === "complete"
+      ) {
+        await chrome.tabs.discard(tab.id);
       }
-  } catch (e) {
-      console.warn("Group or tabs no longer exist.");
+    }
+  } catch {
+    console.warn("Group gone:", groupId);
   }
 }
 
-// Clean up history when groups are manually closed
-chrome.tabGroups.onRemoved.addListener((group) => {
-    groupHistory = groupHistory.filter(id => id !== group.id);
+chrome.tabGroups.onRemoved.addListener(group => {
+  groupHistory = groupHistory.filter(id => id !== group.id);
 });
 
-// --- 3. UNIFIED COMMUNICATION LISTENER ---
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message.action === "ORGANIZE_TABS") {
-    organizeTabs();
-  } else if (message.action === "NEW_GROUP") {
-    handleGroupSwitch(message.groupId);
-  }
-  // Essential for MV3 to keep the message channel open if needed
-  return true; 
+// -------------------- MESSAGING --------------------
+
+chrome.runtime.onMessage.addListener((msg) => {
+  if (msg.action === "ORGANIZE_TABS") organizeTabs();
+  if (msg.action === "NEW_GROUP") handleGroupSwitch(msg.groupId);
+  return true;
 });

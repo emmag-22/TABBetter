@@ -1,15 +1,41 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta charset="UTF-8" />
   <style>
-    body { width: 200px; padding: 10px; font-family: sans-serif; }
-    button { width: 100%; padding: 10px; cursor: pointer; background: #4285f4; color: white; border: none; border-radius: 4px; }
+    body {
+      width: 200px;
+      padding: 10px;
+      font-family: sans-serif;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      cursor: pointer;
+      background: #4285f4;
+      color: white;
+      border: none;
+      border-radius: 4px;
+    }
+
+    p {
+      font-size: 12px;
+      text-align: center;
+      margin-top: 8px;
+      color: #555;
+    }
   </style>
 </head>
+
 <body>
   <h3>Tab Organizer</h3>
-  <button id="groupBtn">Organize Tabs</button>
-  <p id="status"></p>
+
+  <!-- IMPORTANT: id must match popup.js -->
+  <button id="organize">Organize Tabs</button>
+
+  <p id="status">Ready</p>
+
   <script src="popup.js"></script>
 </body>
 </html>
