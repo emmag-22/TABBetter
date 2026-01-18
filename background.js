@@ -50,20 +50,26 @@ async function organizeTabs() {
     const data = await response.json();
     const result = JSON.parse(data.candidates[0].content.parts[0].text);
 
-    for (const group of result.groups) {
-      if (group.tabIds.length > 0) {
-        const validTabIds = await checkValidTabs(group.tabIds);
-        if (validTabIds.length > 0) {
-          const groupId = await chrome.tabs.group({ tabIds: validTabIds });
-          await chrome.tabGroups.update(groupId, {
-            title: group.name,
-            color: group.color
-          });
-          // Track the newly created group as "Active"
-          handleGroupSwitch(groupId);
-        }
+    // Inside your organizeTabs() function, update the grouping loop:
+for (const group of result.groups) {
+  if (group.tabIds.length > 0) {
+      // Only use IDs that still exist AND are not currently being discarded
+      const validTabIds = await checkValidTabs(group.tabIds);
+      
+      if (validTabIds.length > 0) {
+          try {
+              const groupId = await chrome.tabs.group({ tabIds: validTabIds });
+              await chrome.tabGroups.update(groupId, {
+                  title: group.name,
+                  color: group.color
+              });
+              handleGroupSwitch(groupId);
+          } catch (e) {
+              console.error("Error creating group:", e);
+          }
       }
-    }
+  }
+}
     console.log("Organization Complete");
   } catch (error) {
     console.error("AI Org Error:", error);
@@ -100,15 +106,22 @@ async function handleGroupSwitch(newGroupId) {
 }
 
 async function suspendEntireGroup(groupId) {
-    try {
-        const tabs = await chrome.tabs.query({ groupId: groupId });
-        tabs.forEach(tab => {
-            // Only discard if tab is not active, audible, or pinned
-            if (!tab.active && !tab.audible && !tab.pinned) {
-                chrome.tabs.discard(tab.id);
-            }
-        });
-    } catch (e) { console.warn("Group missing during suspension."); }
+  try {
+      const tabs = await chrome.tabs.query({ groupId: groupId });
+      for (const tab of tabs) {
+          // Check if the tab actually has a renderer (status is 'complete')
+          // and isn't already discarded
+          if (!tab.active && !tab.audible && !tab.pinned && !tab.discarded && tab.status === 'complete') {
+              try {
+                  await chrome.tabs.discard(tab.id);
+              } catch (e) {
+                  console.warn(`Could not discard tab ${tab.id}: ${e.message}`);
+              }
+          }
+      }
+  } catch (e) {
+      console.warn("Group or tabs no longer exist.");
+  }
 }
 
 // Clean up history when groups are manually closed
