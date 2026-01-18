@@ -1,4 +1,4 @@
-const API_KEY = "AIzaSyDE9Sf05YTI5LCovW4qXgbvEIJNj2LZmxI"; // Paste secret API key here
+const API_KEY = "AIzaSyBxUMiONNy7Ds3kSEJX2Woqb8cJW6aJZ74"; // Paste secret API key here
 
 /* =========================
    AI TAB GROUPING
