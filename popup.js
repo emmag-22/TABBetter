@@ -1,4 +1,5 @@
-const API_KEY = "AIzaSyDm8y9wul_FhQdcICrEznB77Tjm9HF2XO4"; // Paste secret API key here
+const API_KEY = "AIzaSyBZYY5zDWQG_pyxnQ9qNpDukSO0wvvuOhQ"; // Paste secret API key here
+
 
 document.getElementById('groupBtn').addEventListener('click', async () => {
   const status = document.getElementById('status');
@@ -39,5 +40,24 @@ document.getElementById('groupBtn').addEventListener('click', async () => {
   } catch (error) {
     status.innerText = "Error! Check the console.";
     console.error("Extension Error:", error);
+  }
+});
+
+// UNGROUP ALL BUTTON
+document.getElementById('ungroupBtn').addEventListener('click', async () => {
+  try {
+    // 1. Get all tabs in the current window
+    const tabs = await chrome.tabs.query({ currentWindow: true });
+    
+    // 2. Extract only the tab IDs
+    const tabIds = tabs.map(t => t.id);
+    
+    // 3. Remove them from any existing groups
+    if (tabIds.length > 0) {
+      await chrome.tabs.ungroup(tabIds);
+      console.log("All tabs ungrouped successfully.");
+    }
+  } catch (error) {
+    console.error("Failed to ungroup tabs:", error);
   }
 });
