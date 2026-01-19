@@ -1,6 +1,6 @@
 async function getApiKey() {
-  const { GEMINI_API_KEY } = await chrome.storage.local.get("AIzaSyDAeDZgZlOJARLU1bSHfY1G6JFFDcCgA58");
-  return GEMINI_API_KEY;
+  const result = await chrome.storage.local.get("GEMINI_API_KEY");
+  return result.GEMINI_API_KEY;
 }
 
 /* =========================
@@ -18,6 +18,14 @@ document.getElementById('groupBtn').addEventListener('click', async () => {
   try {
     const tabs = await chrome.tabs.query({ currentWindow: true });
     const tabData = tabs.map(t => ({ id: t.id, title: t.title }));
+
+    const API_KEY = await getApiKey();
+
+    if (!API_KEY) {
+      status.innerText = "Missing API key";
+      throw new Error("No Gemini API key found");
+    }
+
 
     const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${API_KEY}`;
 
