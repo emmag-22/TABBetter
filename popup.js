@@ -7,13 +7,15 @@ async function getApiKey() {
    AI TAB GROUPING
 ========================= */
 
+const status = document.getElementById("status");
 const statusText = document.getElementById("statusText");
 const spinner = document.getElementById("statusSpinner");
 
 
 document.getElementById('groupBtn').addEventListener('click', async () => {
-  const status = document.getElementById('status');
-  status.innerText = "Analyzing tabs...";
+  statusText.textContent = "Analyzing tabs";
+  spinner.classList.remove("hidden");
+  status.style.opacity = 1;
 
   try {
     const tabs = await chrome.tabs.query({ currentWindow: true });
@@ -121,7 +123,7 @@ Tabs: ${JSON.stringify(tabData)}`
         if (c.includes("violet")) return "purple";
         if (c.includes("rose")) return "pink";
       
-        // Final fallback → random (NOT blue)
+        // Final fallback → random (no default color)
         return getRandomGroupColor();
       }
       
@@ -133,12 +135,20 @@ Tabs: ${JSON.stringify(tabData)}`
       
     }
 
-    status.innerText = "Done!";
+    spinner.classList.add("hidden");
+    statusText.textContent = "Done!";
+
+    setTimeout(() => {
+      status.style.opacity = 0;
+    }, 1500);
+
+
   } catch (error) {
     status.innerText = "Error! Check console.";
     console.error("Extension Error:", error);
     spinner.classList.add("hidden");
     statusText.textContent = "Error. Check console.";
+    status.style.opacity = 1;
 
   }
 });
@@ -255,19 +265,6 @@ document.getElementById("closeMemory").addEventListener("click", () => {
 });
 
 status.style.opacity = 0;
-setTimeout(() => {
-  const statusText = document.getElementById("statusText");
-  const spinner = document.getElementById("statusSpinner");
-
-  statusText.textContent = "Analyzing tabs";
-  spinner.classList.remove("hidden");
-
-
-  status.style.opacity = 1;
-}, 150);
-
-statusText.textContent = "Done!";
-spinner.classList.add("hidden");
 
 
 console.log("Spinner element:", spinner);
