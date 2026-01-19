@@ -1,4 +1,7 @@
-import { GEMINI_API_KEY } from "./config.js";
+async function getApiKey() {
+  const { GEMINI_API_KEY } = await chrome.storage.local.get("AIzaSyDAeDZgZlOJARLU1bSHfY1G6JFFDcCgA58");
+  return GEMINI_API_KEY;
+}
 
 /* =========================
    AI TAB GROUPING
