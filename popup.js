@@ -1,4 +1,4 @@
-const API_KEY = "AIzaSyBLxybnjLIqtYV7RCsjaVwmwAimzaHdndQ"; // Paste secret API key here
+import { GEMINI_API_KEY } from "./config.js";
 
 /* =========================
    AI TAB GROUPING
@@ -26,12 +26,28 @@ document.getElementById('groupBtn').addEventListener('click', async () => {
           parts: [{
             text: `Group these chrome tabs into logical categories. 
             Rules:
+CRITICAL RULES (must follow):
+- EVERY tab provided MUST appear in exactly ONE group
+- DO NOT omit, merge, or invent tab IDs
+- If a tab does not clearly fit a category, assign it to "Misc"
+- Use ALL tabIds provided
+
+GROUPING RULES:
 - Category names must be SHORT (1–2 words max)
 - Prefer simple nouns
 - No "&", "and", or long phrases
-- Examples: "School", "News", "Shopping", "Media", "Work"
+- Use common-sense browsing categories
+
+EXAMPLES OF VALID CATEGORIES:
+"School", "News", "Shopping", "Media", "Work", "Social", "Misc"
+
 Return ONLY a JSON array of objects:
-[{"name":"Category","color":"blue","tabIds":[1,2]}].
+[{"name":"Category","tabIds":[1,2]}]
+
+Do NOT include explanations.
+Do NOT include markdown.
+Ensure every tabId appears exactly once.
+
 Tabs: ${JSON.stringify(tabData)}`
           }]
         }]
@@ -51,6 +67,23 @@ Tabs: ${JSON.stringify(tabData)}`
     for (const group of groups) {
       const groupId = await chrome.tabs.group({ tabIds: group.tabIds });
 
+      function getRandomGroupColor() {
+        const colors = [
+          "blue",
+          "cyan",
+          "green",
+          "grey",
+          "orange",
+          "pink",
+          "purple",
+          "red",
+          "yellow"
+        ];
+      
+        return colors[Math.floor(Math.random() * colors.length)];
+      }
+      
+
       function normalizeGroupColor(color) {
         const allowed = [
           "blue",
@@ -64,19 +97,21 @@ Tabs: ${JSON.stringify(tabData)}`
           "yellow"
         ];
       
-        if (!color) return "blue";
+        // If AI did not provide a color → random
+        if (!color) return getRandomGroupColor();
       
         const c = color.toLowerCase();
       
         if (allowed.includes(c)) return c;
       
-        // Smart fallbacks for AI colors
+        // Optional soft mapping (keeps your existing logic)
         if (c.includes("teal") || c.includes("mint") || c.includes("aqua")) return "cyan";
         if (c.includes("emerald")) return "green";
         if (c.includes("violet")) return "purple";
         if (c.includes("rose")) return "pink";
       
-        return "blue"; // safe default
+        // Final fallback → random (NOT blue)
+        return getRandomGroupColor();
       }
       
 
