@@ -1,5 +1,27 @@
-const GEMINI_API_KEY = 'AIzaSyDm8y9wul_FhQdcICrEznB77Tjm9HF2XO4';
-const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+async function callGemini(prompt) {
+  // Read key from storage instead
+  const result = await chrome.storage.local.get("geminiApiKey");
+  const API_KEY = result.geminiApiKey;
+
+  if (!API_KEY) {
+    console.error("No API key set. Please set one via the extension.");
+    return;
+  }
+
+  const response = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }]
+      })
+    }
+  );
+
+  const data = await response.json();
+  return data;
+}
 
 // Listen for the message from popup.js
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
